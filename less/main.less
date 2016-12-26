@@ -1,0 +1,67 @@
+
+@import "variables";
+
+html, body {
+margin:0px;
+padding:0px;
+height:100%;
+overflow:hidden;
+}
+
+.dhx_cal_event_clear{
+    color: @default-color-font;
+}
+
+.dhx_cal_event_line{
+    background-color: @event-background;
+}
+
+.dhx_month_head.dhx_year_event {
+    background-color: @mini-calendar-event;
+}
+
+.dhx_now .dhx_month_head, .dhx_now .dhx_month_body{
+    background-color: @now-background;
+}
+
+.dhx_now .dhx_month_head{
+    color: @default-color-font;
+}
+
+.dhx_cal_event .dhx_body, .dhx_cal_event .dhx_footer, .dhx_cal_event .dhx_header, .dhx_cal_event .dhx_title {
+    background-color: @event-background;
+}
+
+.not-allowed{
+    background-color: @not-allowed-backgroud;
+    border-radius: 9px;
+    height: 19px;
+    line-height: 17px;
+    color: white;
+}
+
+.not-allowed .dhx_body, .not-allowed .dhx_footer, .not-allowed .dhx_header, .not-allowed .dhx_title {
+    background-color: @not-allowed-backgroud;
+}
+
+.not-allowed .dhx_cal_editor{
+    color: #333333;
+}
+
+.readonly-event{
+    color: @readonly-color-font;
+    opacity: 0.5;
+}
+
+.readonly-event .dhx_header, .readonly-event .dhx_title, .readonly-event .dhx_body, .readonly-event .dhx_footer{
+    background-color: @readonly-event-background;
+}
+
+.date-disabled .dhx_month_head, .date-disabled .dhx_month_body{
+    background-color: @disabled-background;
+    opacity: 0.3;
+}
+
+.weekend{
+    background-image: url('../img/fat_lines.png');
+}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>calendar</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/dhtmlxscheduler.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="js/dhtmlx/dhtmlxscheduler.js"></script>
+    <script src="js/dhtmlx/dhtmlxscheduler_recurring.js"></script>
+    <script src="js/dhtmlx/dhtmlxscheduler_agenda_view.js"></script>
+    <script src="js/dhtmlx/dhtmlxscheduler_minical.js"></script>
+    <script src="js/dhtmlx/dhtmlxscheduler_serialize.js"></script>
+    <script src="js/dhtmlx/dhtmlxscheduler_tooltip.js"></script>
+    <script src="js/dhtmlx/dhtmlxscheduler_limit.js"></script>
+    <script src="js/dhtmlx/dhtmlxscheduler_readonly.js"></script>
+    <script src="js/dhtmlx/locale_pt.js"></script>
+    <script src="js/dhtmlx/locale_recurring_pt.js"></script>
+</head>
+
+<body>
+    <div id="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
+        <div class="dhx_cal_navline">
+            <div class="dhx_cal_prev_button">&nbsp;</div>
+            <div class="dhx_cal_next_button">&nbsp;</div>
+            <div class="dhx_cal_today_button"></div>
+            <div class="dhx_cal_date"></div>
+            <div class="dhx_cal_date"></div>
+            <div class="dhx_minical_icon" id="dhx_minical_icon" onclick="show_minical()">&nbsp;</div>
+            <div class="dhx_cal_tab" name="agenda_tab" style="right:280px;"></div>
+            <div class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+            <div class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+            <div class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+        </div>
+        <div class="dhx_cal_header"></div>
+        <div class="dhx_cal_data"></div>
+    </div>
+    <script type="text/javascript">
+        var pastEventMessage = "Você não pode adicionar ou editar eventos passados.";
+        var othersEventMessage = "Você não têm permissão para editar o evento.";
+
+        (function () {
+            scheduler.config.start_on_monday = false;
+            scheduler.config.xml_date = "%Y-%m-%d %H:%i";
+            scheduler.config.first_hour = 8;
+            scheduler.config.last_hour = 18;
+            scheduler.config.limit_time_select = true;
+            scheduler.config.repeat_date = "%d/%m/%Y";
+            scheduler.config.include_end_by = true;
+            scheduler.config.repeat_precise = true;
+            scheduler.config.multi_day = true;
+            scheduler.config.show_loading = true;
+            scheduler.addMarkedTimespan({
+                days: [0, 6],
+                zones: 'fullday',
+                css: 'weekend'
+            });
+            scheduler.attachEvent("onBeforeDrag", isReadOnly);
+            scheduler.attachEvent("onClick", isReadOnly);
+            scheduler.attachEvent("onBeforeEventChanged", beforeEventChanged);
+            //scheduler.attachEvent("onEventSave", labelEdit);
+            dhtmlXTooltip.config.className = "dhtmlXTooltip tooltip";
+            dhtmlXTooltip.config.timeout_to_display = 50;
+            dhtmlXTooltip.config.delta_x = 15;
+            dhtmlXTooltip.config.delta_y = -20;
+            var format = scheduler.date.date_to_str("%d/%m/%Y %H:%i");
+            scheduler.templates.event_class = function (start, end, event) {
+                var css = "";
+
+                if (event.end_date < moment(new Date()).startOf('day'))
+                    css += " readonly-event";
+
+                if (event.owner == false) {
+                    css += " not-allowed";
+                }
+
+                return css;
+            };
+            scheduler.templates.month_date_class = function (date) {
+                if (date < moment(new Date()).startOf('day'))
+                    return "date-disabled";
+                return "";
+            };
+            scheduler.templates.tooltip_text = function (start, end, event) {
+                return "<b>Evento:&nbsp;</b>" + event.text + "<br/><b>Início:&nbsp;</b>" +
+                    format(start) + "<br/><b>Fim:&nbsp;</b>" + format(end);
+            };
+            scheduler.init("scheduler_here", new Date(), "month");
+            var events = [{
+                id: 1,
+                text: "Event 1",
+                start_date: moment(new Date()).subtract(3, 'day'),
+                end_date: moment(new Date()).subtract(3, 'day').add(1, 'hour'),
+                readonly: true
+            }, {
+                id: 2,
+                text: "Event 2",
+                start_date: moment(new Date()),
+                end_date: moment(new Date()).add(1, 'day').subtract(2, 'hour')
+            }, {
+                id: 3,
+                text: "Event 3",
+                start_date: moment(new Date()).add(3, 'day'),
+                end_date: moment(new Date()).add(3, 'day').add(2, 'hour'),
+                readonly: true,
+                owner: false
+            }];
+            scheduler.parse(events, 'json');
+        })();
+
+        function isReadOnly(event_id) {
+            if (!event_id) return true;
+            return !this.getEvent(event_id).readonly;
+        }
+
+        function beforeEventChanged(event_obj, event, is_new, original) {
+            if (event_obj && event_obj.start_date < moment(new Date()).startOf('day')){
+                console.log(pastEventMessage);
+                return false;
+            }
+            
+            return true;
+        }
+
+        function labelEdit(event_id, event){
+            debugger;
+        }
+
+        function show_minical() {
+            if (scheduler.isCalendarVisible()) {
+                scheduler.destroyCalendar();
+            } else {
+                scheduler.renderCalendar({
+                    position: "dhx_minical_icon",
+                    date: scheduler._date,
+                    navigation: true,
+                    handler: function (date, calendar) {
+                        scheduler.setCurrentView(date);
+                        scheduler.destroyCalendar()
+                    }
+                });
+            }
+        }
+
+    </script>
+</body>
+
+</html>
