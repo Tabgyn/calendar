@@ -30,6 +30,7 @@ scheduler.locale = {
         section_time: "Período de tempo",
         full_day: "Dia inteiro",
         confirm_recurring: "Deseja editar todos esses eventos repetidos?",
+        section_title: "Título",
         section_recurring: "Repetir evento",
         button_recurring: "Desabilitar",
         button_recurring_open: "Habilitar",

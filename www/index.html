@@ -44,30 +44,36 @@
         var othersEventMessage = "Você não têm permissão para editar o evento.";
 
         (function () {
-            scheduler.config.start_on_monday = false;
-            scheduler.config.xml_date = "%Y-%m-%d %H:%i";
-            scheduler.config.first_hour = 8;
-            scheduler.config.last_hour = 18;
-            scheduler.config.limit_time_select = true;
-            scheduler.config.repeat_date = "%d/%m/%Y";
-            scheduler.config.include_end_by = true;
-            scheduler.config.repeat_precise = true;
-            scheduler.config.multi_day = true;
-            scheduler.config.show_loading = true;
             scheduler.addMarkedTimespan({
                 days: [0, 6],
                 zones: 'fullday',
                 css: 'weekend'
             });
+
             scheduler.attachEvent("onBeforeDrag", isReadOnly);
             scheduler.attachEvent("onClick", isReadOnly);
             scheduler.attachEvent("onBeforeEventChanged", beforeEventChanged);
-            //scheduler.attachEvent("onEventSave", labelEdit);
-            dhtmlXTooltip.config.className = "dhtmlXTooltip tooltip";
-            dhtmlXTooltip.config.timeout_to_display = 50;
-            dhtmlXTooltip.config.delta_x = 15;
-            dhtmlXTooltip.config.delta_y = -20;
-            var format = scheduler.date.date_to_str("%d/%m/%Y %H:%i");
+            scheduler.attachEvent("onLightbox", lightBox);
+
+            scheduler.config.active_link_view = "day";
+            scheduler.config.first_hour = 8;
+            scheduler.config.include_end_by = true;
+            scheduler.config.last_hour = 18;
+            scheduler.config.limit_time_select = true;
+            scheduler.config.max_month_events = 3;
+            scheduler.config.multi_day = true;
+            scheduler.config.repeat_date = "%d/%m/%Y";
+            scheduler.config.repeat_precise = true;
+            scheduler.config.show_loading = true;
+            scheduler.config.start_on_monday = false;
+            scheduler.config.xml_date = "%Y-%m-%d %H:%i";
+
+            scheduler.templates.agenda_text = function (start, end, ev) {
+                return ev.title + " - " + ev.text;
+            };
+            scheduler.templates.event_bar_text = function (start, end, ev) {
+                return ev.title ? ev.title : 'Novo evento';
+            };
             scheduler.templates.event_class = function (start, end, event) {
                 var css = "";
 
@@ -80,29 +86,90 @@
 
                 return css;
             };
+            scheduler.templates.event_text = function (start, end, ev) {
+                return ev.title ? ev.title : 'Novo evento';
+            };
             scheduler.templates.month_date_class = function (date) {
                 if (date < moment(new Date()).startOf('day'))
                     return "date-disabled";
                 return "";
             };
+            scheduler.templates.month_events_link = function (date, count) {
+                var diff = count - 3;
+                return "<a class='more-link'>Mais(" + (diff) + " evento" + (diff > 1 ? "s)</a>" : ")</a>");
+            };
+
+            //Tooltip
+            dhtmlXTooltip.config.className = "dhtmlXTooltip tooltip";
+            dhtmlXTooltip.config.timeout_to_display = 50;
+            dhtmlXTooltip.config.delta_x = 15;
+            dhtmlXTooltip.config.delta_y = -20;
+            var format = scheduler.date.date_to_str("%d/%m/%Y %H:%i");
             scheduler.templates.tooltip_text = function (start, end, event) {
                 return "<b>Evento:&nbsp;</b>" + event.text + "<br/><b>Início:&nbsp;</b>" +
                     format(start) + "<br/><b>Fim:&nbsp;</b>" + format(end);
             };
+
+            // Title inside lightbox
+            scheduler.form_blocks["block_title"] = {
+                render: function (sns) {
+                    return "<div class='dhx_cal_ltext' style='height:28px;'><input type='text'></div>";
+                },
+                set_value: function (node, value, ev) {
+                    node.childNodes[0].value = ev.title || value;
+                },
+                get_value: function (node, ev) {
+                    ev.title = node.childNodes[0].value;
+                    return node.childNodes[0].value;
+                },
+                focus: function (node) {
+                    var a = node.childNodes[0];
+                    a.select();
+                    a.focus();
+                }
+            };
+            scheduler.config.lightbox.sections = [{
+                name: "title",
+                height: 28,
+                map_to: "text",
+                type: "block_title",
+                focus: true
+            }, {
+                name: "description",
+                height: 130,
+                map_to: "text",
+                type: "textarea"
+            }, {
+                name: "recurring",
+                height: 28,
+                type: "recurring",
+                map_to: "rec_type",
+                button: "recurring"
+            }, {
+                name: "time",
+                height: 72,
+                type: "time",
+                map_to: "auto"
+            }];
+
+            //Initialize the scheduler
             scheduler.init("scheduler_here", new Date(), "month");
             var events = [{
                 id: 1,
+                title: 'Event 1',
                 text: "Event 1",
                 start_date: moment(new Date()).subtract(3, 'day'),
                 end_date: moment(new Date()).subtract(3, 'day').add(1, 'hour'),
                 readonly: true
             }, {
                 id: 2,
+                title: 'Event 2',
                 text: "Event 2",
                 start_date: moment(new Date()),
                 end_date: moment(new Date()).add(1, 'day').subtract(2, 'hour')
             }, {
                 id: 3,
+                title: 'Event 3',
                 text: "Event 3",
                 start_date: moment(new Date()).add(3, 'day'),
                 end_date: moment(new Date()).add(3, 'day').add(2, 'hour'),
@@ -118,15 +185,25 @@
         }
 
         function beforeEventChanged(event_obj, event, is_new, original) {
-            if (event_obj && event_obj.start_date < moment(new Date()).startOf('day')){
+            if (event_obj && event_obj.start_date < moment(new Date()).startOf('day')) {
                 console.log(pastEventMessage);
                 return false;
             }
-            
+
             return true;
         }
 
-        function labelEdit(event_id, event){
+        function lightBox(id) {
+            var event_obj = scheduler.getEvent(id);
+            if (event_obj.readonly) {
+                var section_title = scheduler.formSection("title");
+                var value = section_title.getValue();
+
+                section_title.node.innerHTML = "<span class='dhx_text_disabled'>" + value + "</span>";
+            }
+        }
+
+        function labelEdit(event_id, event) {
             debugger;
         }
 

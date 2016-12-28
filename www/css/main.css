@@ -1,63 +1,80 @@
 html,
 body {
-  margin: 0px;
-  padding: 0px;
-  height: 100%;
-  overflow: hidden;
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    overflow: hidden;
 }
+
 .dhx_cal_event_clear {
-  color: #22baa0;
+    color: #22baa0;
 }
+
 .dhx_cal_event_line {
-  background-color: #22baa0;
+    background-color: #22baa0;
 }
+
 .dhx_month_head.dhx_year_event {
-  background-color: #c8e3de;
+    background-color: #c8e3de;
 }
+
 .dhx_now .dhx_month_head,
 .dhx_now .dhx_month_body {
-  background-color: #c8e3de;
+    background-color: #c8e3de;
 }
+
 .dhx_now .dhx_month_head {
-  color: #22baa0;
+    color: #22baa0;
 }
+
 .dhx_cal_event .dhx_body,
 .dhx_cal_event .dhx_footer,
 .dhx_cal_event .dhx_header,
 .dhx_cal_event .dhx_title {
-  background-color: #22baa0;
+    background-color: #22baa0;
 }
+
+.dhx_form_repeat div {
+    height: 125px;
+}
+
 .not-allowed {
-  background-color: #c85719;
-  border-radius: 9px;
-  height: 19px;
-  line-height: 17px;
-  color: white;
+    background-color: #c85719;
+    border-radius: 9px;
+    height: 19px;
+    line-height: 17px;
+    color: white;
 }
+
 .not-allowed .dhx_body,
 .not-allowed .dhx_footer,
 .not-allowed .dhx_header,
 .not-allowed .dhx_title {
-  background-color: #c85719;
+    background-color: #c85719;
 }
+
 .not-allowed .dhx_cal_editor {
-  color: #333333;
+    color: #333333;
 }
+
 .readonly-event {
-  color: #333333;
-  opacity: 0.5;
+    color: #333333;
+    opacity: 0.5;
 }
+
 .readonly-event .dhx_header,
 .readonly-event .dhx_title,
 .readonly-event .dhx_body,
 .readonly-event .dhx_footer {
-  background-color: #9c9c9c;
+    background-color: #9c9c9c;
 }
+
 .date-disabled .dhx_month_head,
 .date-disabled .dhx_month_body {
-  background-color: #eeeeee;
-  opacity: 0.3;
+    background-color: #eeeeee;
+    opacity: 0.3;
 }
+
 .weekend {
-  background-image: url('../img/fat_lines.png');
+    background-image: url('../img/fat_lines.png');
 }
